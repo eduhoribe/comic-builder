@@ -23,10 +23,10 @@ if __name__ == '__main__':
     comic_title = 'Youjo Senki'
     comic_format = 'MOBI'  # TODO ENUM
     upscale = True
-    stretch = False
+    stretch = True
     grayscale = False
-    directory = '/home/eduhoribe/Manga/Youjo Senki'
     auxiliary_folder = '/home/eduhoribe'
+    directory = '/home/eduhoribe/Manga/Youjo Senki'
 
     temp_directory = '{}/manga-py-assembler/{}_{}'.format(
         auxiliary_folder if auxiliary_folder is not None else tempfile.gettempdir(), random_id, comic_title)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     volumes = {}
 
     # Read files
-    files = [file for file in listdir(directory) if isfile(join(directory, file))]
+    files = [file for file in listdir(directory) if isfile(join(directory, file)) and file.endswith('.zip')]
     for f in files:
         with zipfile.ZipFile(join(directory, f), "r") as zip_file:
             for name in zip_file.namelist():
@@ -77,6 +77,9 @@ if __name__ == '__main__':
             print(chapter)
 
         print()
+        break
+
+    assembled_ebooks = []
 
     for volume in volumes.keys():
         volume_temp_data = join(temp_directory, 'volume_{}'.format(volume))
@@ -98,9 +101,31 @@ if __name__ == '__main__':
         ]
         args = [arg for arg in args if arg != '']
 
-        success = kcc_c2e(args) == 0
+        success = kcc_c2e(args) == 0  # success exit code
 
         if success:
             shutil.rmtree(volume_temp_data)
+            assembled_ebooks.append(join(volume_output, 'volume_{}.{}'.format(volume, comic_format.lower())))
 
-        break
+            break
+
+    # Calibre metadata
+    if os.system('ebook-meta --version') == 0:
+        for ebook_file in assembled_ebooks:
+            args = [
+                '--title="{}"'.format(comic_title),
+                '--authors="{}"'.format('YARE YARE DAZE'),
+                # '--cover="{}"',
+                # '--comments="{}"',
+                # '--publisher="{}"',
+                # '--category="{}"',
+                # '--series="{}"',
+                # '--index="{}"',
+                # '--identifier="{}"',
+                # '--tags="{}"',
+                # '--language="{}"',
+                # '--date="{}"',
+                '"{}"'.format(ebook_file)
+            ]
+            args = [arg for arg in args if arg != '' and arg != '""']
+            os.system('ebook-meta {}'.format(' '.join([arg for arg in args])))
