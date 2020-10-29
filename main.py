@@ -7,15 +7,29 @@ import zipfile
 from os import listdir
 from os.path import isfile, join
 
+from kindlecomicconverter.comic2ebook import main as kcc_c2e
+
 from chapter import Chapter
+from comic_style import ComicStyle
 
 if __name__ == '__main__':
     random_id = hex(hash(random.random()))
 
     # TODO: Parameterize
-    comic_name = 'Youjo Senki'
-    directory = '/home/eduwardo/Manga/Youjo Senki'
-    temp_directory = '{}/manga-py-assembler/{}_{}'.format(tempfile.gettempdir(), random_id, comic_name)
+    device_profile = 'KO'  # TODO ENUM
+    comic_style = ComicStyle.NORMAL
+    low_quality = False
+    output = None
+    comic_title = 'Youjo Senki'
+    comic_format = 'MOBI'  # TODO ENUM
+    upscale = True
+    stretch = False
+    grayscale = False
+    directory = '/home/eduhoribe/Manga/Youjo Senki'
+    auxiliary_folder = '/home/eduhoribe'
+
+    temp_directory = '{}/manga-py-assembler/{}_{}'.format(
+        auxiliary_folder if auxiliary_folder is not None else tempfile.gettempdir(), random_id, comic_title)
 
     print(temp_directory)
 
@@ -52,7 +66,41 @@ if __name__ == '__main__':
         print(volume)
 
         for chapter in chapters:
-            shutil.copy(chapter.local_path, join(volume_directory, 'chapter_{}'.format(chapter.chapter)))
+            chapter_directory = join(volume_directory, 'chapter_{}'.format(chapter.chapter))
+            os.mkdir(chapter_directory)
+
+            with zipfile.ZipFile(chapter.local_path, "r") as zip_file:
+                for name in zip_file.namelist():
+                    with open(join(chapter_directory, name), 'wb') as copy_file:
+                        copy_file.write(zip_file.read(name))
+
             print(chapter)
 
         print()
+
+    for volume in volumes.keys():
+        volume_temp_data = join(temp_directory, 'volume_{}'.format(volume))
+        volume_output = output if output is not None else join(directory, 'assembled')
+        if not os.path.isdir(volume_output):
+            os.makedirs(volume_output)
+
+        args = [
+            '--profile={}'.format(device_profile),
+            comic_style.value,
+            '' if low_quality else '--hq',
+            '--output={}'.format(volume_output),
+            '--title="{}"'.format(comic_title),
+            '--format={}'.format(comic_format),
+            '--upscale' if upscale else '',
+            '--stretch' if stretch else '',
+            '' if grayscale else '--forcecolor',
+            volume_temp_data,
+        ]
+        args = [arg for arg in args if arg != '']
+
+        success = kcc_c2e(args) == 0
+
+        if success:
+            shutil.rmtree(volume_temp_data)
+
+        break
