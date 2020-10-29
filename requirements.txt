@@ -1,2 +1,1 @@
-manga-py >= 1.22.1
 KindleComicConverter >= 5.5.2
