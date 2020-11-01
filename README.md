@@ -14,6 +14,6 @@ format
 ## Suggested Workflow
 
 ```
-manga-py --destination "$COMIC_PATH" --save-current-chapter-info --save-manga-info [other-options...] URL
-manga-py-assembler [other-options...] --comic-path "$COMIC_PATH"
+manga-py --destination "$COMIC_DOWNLOAD_PATH" --save-current-chapter-info --save-manga-info [other-options...] URL
+manga-py-assembler [other-options...] --comic-path "$COMIC_DOWNLOAD_PATH/$COMIC_NAME"
 ```
