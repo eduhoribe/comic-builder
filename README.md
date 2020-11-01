@@ -10,3 +10,10 @@ format
 ### Optional dependencies
 
 - [calibre](https://github.com/kovidgoyal/calibre) >> For metadata edit
+
+## Suggested Workflow
+
+```
+manga-py --destination "$COMIC_PATH" --save-current-chapter-info --save-manga-info [other-options...] URL
+manga-py-assembler [other-options...] --comic-path "$COMIC_PATH"
+```
