@@ -6,8 +6,7 @@ from os import path
 
 import utils
 from argument_parser import build_argument_parser
-from comic import Comic
-from manga_dex_org_parser import MangaDexOrgParser
+from metadata_parser import MetadataParser
 from settings import Settings
 
 if __name__ == '__main__':
@@ -18,22 +17,25 @@ if __name__ == '__main__':
     # Define settings and log level
     settings = Settings(args)
     logging.getLogger().setLevel(logging.DEBUG if settings.debug_enabled else logging.INFO)
+    debug(args)
+    debug(settings)
 
     if not path.isdir(settings.comic_path):
         fatal('Comic path "{}" does not exist'.format(path.abspath(settings.comic_path)))
         sys.exit(1)
 
     # Read comic info
-    comic = Comic.parse(MangaDexOrgParser, settings.comic_path)
+    comic = MetadataParser.parse(settings.metadata_path)
     comic.overwrite_user_metadata(args)
+    debug(comic)
 
     # Prepare temporary directory
     temp_directory = settings.temp_directory(comic)
     if path.isdir(temp_directory):
-        fatal('directory {} exists...somehow. Stopping right here to prevent a bigger mess'.format(temp_directory))
+        fatal('Directory {} exists...somehow. Stopping right here to prevent a bigger mess'.format(temp_directory))
         sys.exit(1)
 
-    debug('using temporary directory "{}"'.format(temp_directory))
+    debug('Using temporary directory "{}"'.format(temp_directory))
     os.makedirs(temp_directory)
 
     # Find files
@@ -58,8 +60,12 @@ if __name__ == '__main__':
     # Assemble volumes in ebook format
     assembled_ebooks = utils.assemble_volumes(settings, comic, volumes)
 
-    # Calibre metadata
-    utils.calibre_metadata(settings, comic, chapters, assembled_ebooks)
+    # Fill metadata
+    utils.fill_metadata(settings, comic, chapters, assembled_ebooks)
+
+    # Convert to MOBI
+    if settings.comic_format == 'MOBI':
+        utils.convert_to_mobi(assembled_ebooks)
 
     # Show results
     info('Finished!')

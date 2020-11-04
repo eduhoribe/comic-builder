@@ -1,0 +1,17 @@
+{
+  "title": "COMIC TITLE",
+  "description": "COMIC DESCRIPTION",
+  "authors": [
+    "AUTHOR 1",
+    "AUTHOR 2",
+    "AUTHOR 3"
+  ],
+  "sauce": "COMIC SOURCE",
+  "volume_covers": {
+    "1": "VOLUME 1 COVER",
+    "2": "VOLUME 2 COVER",
+    "3": "VOLUME 3 COVER",
+    "4": "VOLUME 4 COVER",
+    "5": "VOLUME 5 COVER"
+  }
+}

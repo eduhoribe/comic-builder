@@ -26,6 +26,7 @@ class Settings:
         self.random_id = hex(hash(random.random()))
 
         self.comic_path = args.comic_path
+        self.metadata_path = self.__prepare_metadata_path__(args.metadata)
         self.device_profile = args.device_profile
         self.comic_style = args.comic_style
         self.low_quality = args.low_quality
@@ -36,6 +37,18 @@ class Settings:
         self.grayscale = args.grayscale
         self.auxiliary_folder = args.aux_parent_folder
         self.debug_enabled = args.debug
+
+    @property
+    def device_comic_format_kcc(self):
+        return 'EPUB'
+
+    @property
+    def device_comic_format_kcc_param(self):
+        return '--format={}'.format(self.device_comic_format_kcc)
+
+    @property
+    def device_profile_kcc_param(self):
+        return '--profile={}'.format(self.device_profile)
 
     @property
     def comic_style_param(self):
@@ -50,6 +63,10 @@ class Settings:
     @property
     def low_quality_param(self):
         return '' if self.low_quality else '--hq'
+
+    @property
+    def output_param(self):
+        return '--output={}'.format(self.output)
 
     @property
     def upscale_param(self):
@@ -79,3 +96,6 @@ class Settings:
 
     def __prepare_output__(self, output):
         return output if output is not None else join(self.comic_path, 'assembled')
+
+    def __prepare_metadata_path__(self, metadata_path):
+        return metadata_path if metadata_path is not None else join(self.comic_path, 'info.json')

@@ -3,13 +3,14 @@ import re
 import shutil
 import urllib.request
 import zipfile
-from logging import debug
-from logging import warning
+from logging import debug, warning
 from os.path import join
 
+import ruamel.std.zipfile as zip_utils
 from kindlecomicconverter.comic2ebook import main as kcc_c2e
 
 from chapter import Chapter
+from comic import Comic
 
 
 def volume_pattern(title, volume_number):
@@ -48,14 +49,38 @@ def read_chapters_as_volumes(chapters):
     return volumes
 
 
-def build_comic_info_xml(comic, volume):
+def build_comic_info_author_xml(authors: list):
+    authors_str = ''
+
+    if len(authors) >= 1:
+        authors_str += '<Writer>{}</Writer>'.format(authors[0])
+
+    if len(authors) >= 2:
+        authors_str += '<Pencillers>{}</Pencillers>'.format(authors[1])
+
+    if len(authors) >= 3:
+        authors_str += '<Inkers>{}</Inkers>'.format(authors[2])
+
+    if len(authors) >= 4:
+        colorists = []
+
+        for colorist in authors[3:]:
+            colorists.append(colorist)
+
+        authors_str += '<Colorists>{}</Colorists>'.format(', '.join(colorists))
+
+    return authors_str
+
+
+def build_comic_info_xml(comic: Comic, volume):
     return '''<?xml version="1.0" encoding="utf-8"?>
 <ComicInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <Series>{}</Series>
 <Volume>{}</Volume>
 <Summary>{}</Summary>
-<Writer>{}</Writer>
-</ComicInfo>'''.format(comic.title, volume, comic.description, list(comic.authors)[0])
+{}
+</ComicInfo>'''.format(volume_pattern(comic.title, volume), volume, comic.description,
+                       build_comic_info_author_xml(comic.authors))
 
 
 def extract_volume_pages(settings, comic, volumes):
@@ -63,7 +88,7 @@ def extract_volume_pages(settings, comic, volumes):
         volume_directory = settings.volume_temp_directory(comic, volume)
         os.mkdir(volume_directory)
 
-        debug('Extracting pages for "{}"...'.format(volume_pattern(volume, comic.title)))
+        debug('Extracting pages for "{}"...'.format(volume_pattern(comic.title, volume)))
 
         for chapter in chapters:
             chapter_directory = join(volume_directory, chapter_pattern(chapter.chapter, chapter.title))
@@ -89,12 +114,12 @@ def assemble_volumes(settings, comic, volumes):
         os.path.isdir(settings.output) or os.makedirs(settings.output)
 
         args = [
-            '--profile={}'.format(settings.device_profile),
+            settings.device_profile_kcc_param,
             settings.comic_style_param,
             settings.low_quality_param,
-            '--output={}'.format(settings.output),
+            settings.output_param,
             '--title={}'.format(comic.title),
-            '--format={}'.format(settings.comic_format),
+            settings.device_comic_format_kcc_param,
             settings.upscale_param,
             settings.stretch_param,
             settings.grayscale_param,
@@ -102,12 +127,13 @@ def assemble_volumes(settings, comic, volumes):
         ]
         args = [arg for arg in args if arg != '']  # cleanup kcc args
         debug("kcc args: {}".format(' '.join(args)))
+
         success = kcc_c2e(args) == 0  # assemble success
 
         if success:
             assembled[volume] = (
                 join(settings.output,
-                     '{}.{}'.format(volume_pattern(comic.title, volume), settings.comic_format.lower())))
+                     '{}.{}'.format(volume_pattern(comic.title, volume), settings.device_comic_format_kcc.lower())))
 
     return assembled
 
@@ -124,37 +150,32 @@ def chapter_languages(chapters):
     return set([chapter.language for chapter in chapters])
 
 
-def calibre_metadata(settings, comic, chapters, assembled_ebooks):
-    if os.system('ebook-meta --version') == 0:
-        publishers, languages = chapter_publishers_and_languages(chapters)
+def fill_metadata(settings, comic, chapters, assembled_ebooks):
+    publishers, languages = chapter_publishers_and_languages(chapters)
 
-        for volume, ebook_file in assembled_ebooks.items():
-            cloud_cover_url = comic.covers[int(volume) - 1]
-            response = urllib.request.urlopen(cloud_cover_url)
+    for volume, ebook_file in assembled_ebooks.items():
+        cloud_cover_url = comic.volume_covers[volume]
+        response = urllib.request.urlopen(cloud_cover_url)
 
-            local_cover_path = join(settings.temp_directory(comic), volume_pattern(comic.title, volume), 'cover')
-            with open(local_cover_path, 'wb') as local_cover:
-                local_cover.write(response.read())
+        local_cover_path = join(settings.temp_directory(comic), volume_pattern(comic.title, volume), 'cover')
 
-            args = [
-                '--title="{}"'.format(volume_pattern(comic.title, volume)),
-                '--authors="{}"'.format('&'.join(author for author in comic.authors)),
-                '--cover="{}"'.format(local_cover_path),
-                '--comments="{}"'.format(comic.description),
-                '--publisher="{}"'.format(', '.join([pub for pub in publishers])),
-                '--series="{}"'.format(comic.title),
-                '--index="{}"'.format(volume),
-                '--identifier uri:"{}"'.format(comic.sauce),
-                '--book-producer="{}"'.format(', '.join([pub for pub in publishers])),
-                '--language="{}"'.format(', '.join([lang for lang in languages])),
-                '--date=""',
-                '"{}"'.format(ebook_file)
-            ]
-            args = [arg for arg in args if arg != '' and arg != '""']
-            debug('ebook-meta args: {}'.format(' '.join(args)))
-            os.system('ebook-meta {}'.format(' '.join([arg for arg in args])))
+        with open(local_cover_path, 'wb') as local_cover:
+            local_cover_bytes = response.read()
+            local_cover.write(local_cover_bytes)
+
+        zip_cover_path = 'OEBPS/Images/cover.jpg'
+        zip_utils.delete_from_zip_file(ebook_file, file_names=zip_cover_path)
+
+        with zipfile.ZipFile(ebook_file, 'a') as ebook:
+            ebook.write(local_cover_path, zip_cover_path)
+
+
+def convert_to_mobi(assembled_ebooks):
+    if 'kindlegen' in os.path:
+        for ebook_file in assembled_ebooks.items():
+            os.system('kindlegen "{}" -c2'.format(ebook_file))
     else:
-        warning('Calibre is not installed. Skipping metadata edit...')
+        warning('KindleGen not detected!')
 
 
 def clean_temporary_data(temp_directory, assembled_ebooks=None, force_clean=False):

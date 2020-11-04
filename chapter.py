@@ -17,6 +17,6 @@ class Chapter:
         self.volume = json_object['volume']
         self.chapter = json_object['chapter']
         self.title = json_object['title']
-        self.language = json_object['lang_name']
-        self.publisher = json_object['group_name']
+        self.language = json_object['language']
+        self.publisher = json_object['publisher']
         self.local_path = local_path

@@ -28,7 +28,7 @@ def build_argument_parser():
     archive_group = parser.add_argument_group('Archive options')
     archive_group.add_argument('--output-format',
                                help='Output format. (Default: %(default)s)',
-                               choices=['MOBI', 'EPUB', 'CBZ', 'KFX'],
+                               choices=['MOBI', 'EPUB'],
                                default='MOBI'
                                )
     archive_group.add_argument('--output', help='Output folder. (Default: COMIC_PATH/assembled)')
@@ -37,12 +37,13 @@ def build_argument_parser():
                                     '(Default: System temporary folder)')
 
     metadata_group = parser.add_argument_group('Metadata options')
+    metadata_group.add_argument('--metadata',
+                                help='Path to comic metadata file. (Default: COMIC_PATH/info.json) '
+                                     'The file must follow the sample in '
+                                     'https://github.com/eduhoribe/manga-py-assembler/blob/main/'
+                                     'samples/comic-metadata-sample.json')
     metadata_group.add_argument('--title', help='Comic Title')
-    metadata_group.add_argument('--description', help='Comic Description')
-    metadata_group.add_argument('--alt_titles', help='Comic Alternative titles', nargs='+')
     metadata_group.add_argument('--authors', help='Comic Authors', nargs='+')
-    metadata_group.add_argument('--covers', help='Comic covers URIs', nargs='+')
-    metadata_group.add_argument('--sauce', help='Comic URI source')
 
     image_group = parser.add_argument_group('Image processing options')
     image_group.add_argument('--device-profile',
