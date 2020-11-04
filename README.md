@@ -5,6 +5,7 @@ format
 
 ## Dependencies
 
+- [Python 3](https://www.python.org/)
 - [kcc](https://github.com/ciromattia/kcc) >> To convert the images in ebook format
 
 ### Optional dependencies
@@ -19,7 +20,7 @@ For sites that support chapter and comic metadata (Ex. MangaDex)
 
 ```
 manga-py --save-chapter-info --save-manga-info [-d|--destination] "COMIC_DOWNLOAD_PATH" [other-options...] URL
-manga-py-assembler [other-options...] --comic-path "COMIC_DOWNLOAD_PATH/COMIC_NAME"
+python MANGA_PY_ASSEMBLER_PATH/main.py [other-options...] --comic-path "COMIC_DOWNLOAD_PATH/COMIC_NAME"
 ```
 
 For other sites
@@ -29,5 +30,5 @@ For other sites
 
 ```
 manga-py [-d|--destination] "COMIC_DOWNLOAD_PATH" [other-options...] URL
-manga-py-assembler --metadata "METADATA_FILE" [other-options...] --comic-path "COMIC_DOWNLOAD_PATH/COMIC_NAME"
+python MANGA_PY_ASSEMBLER_PATH/main.py --metadata "METADATA_FILE" [other-options...] --comic-path "COMIC_DOWNLOAD_PATH/COMIC_NAME"
 ```
