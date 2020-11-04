@@ -2,11 +2,13 @@ import os
 import shutil
 import urllib.request
 import zipfile
-from logging import debug, warning, error
+from logging import debug, warning, error, info
 from os.path import join
+from subprocess import STDOUT, PIPE
 
 import ruamel.std.zipfile as zip_utils
 from kindlecomicconverter.comic2ebook import main as kcc_c2e
+from psutil import Popen
 
 from chapter import Chapter
 from comic import Comic
@@ -16,7 +18,10 @@ def volume_pattern(title, volume: str):
     if volume.isnumeric():
         return '{} - Volume {}'.format(title, volume)
 
-    return '{} - {}'.format(title, volume)
+    if volume.strip() != '':
+        return '{} - {}'.format(title, volume)
+
+    return '{}'.format(title)
 
 
 def chapter_pattern(chapter_number, chapter_title: str):
@@ -124,6 +129,20 @@ def extract_volume_pages(settings, comic, volumes):
             comic_info_xml.write(build_comic_info_xml(comic, volume))
 
 
+def get_available_file(file):
+    if not os.path.exists(file):
+        return file
+
+    file_name = file.rsplit('.', 1)
+    file_pattern = os.path.join(file_name[0] + ' ({}).' + file_name[1])
+    postfix = 0
+
+    while os.path.exists(file_pattern.format(postfix)):
+        postfix += 1
+
+    return file_pattern.format(postfix)
+
+
 def assemble_volumes(settings, comic, volumes):
     assembled = {}
 
@@ -131,16 +150,23 @@ def assemble_volumes(settings, comic, volumes):
         volume_temp_data = settings.volume_temp_directory(comic, volume)
         os.path.isdir(settings.output) or os.makedirs(settings.output)
 
+        output_file = join(settings.output,
+                           '{}.{}'.format(volume_pattern(comic.title, volume),
+                                          settings.device_comic_format_kcc.lower()))
+
+        output_file = get_available_file(output_file)
+
         args = [
             settings.device_profile_kcc_param,
             settings.comic_style_param,
             settings.low_quality_param,
             settings.output_param,
-            '--title={}'.format(comic.title),
+            '--title={}'.format(volume_pattern(comic.title, volume)),
             settings.device_comic_format_kcc_param,
             settings.upscale_param,
             settings.stretch_param,
             settings.grayscale_param,
+            '--output={}'.format(output_file),
             volume_temp_data,
         ]
         args = [arg for arg in args if arg != '']  # cleanup kcc args
@@ -149,9 +175,7 @@ def assemble_volumes(settings, comic, volumes):
         success = kcc_c2e(args) == 0  # assemble success
 
         if success:
-            assembled[volume] = (
-                join(settings.output,
-                     '{}.{}'.format(volume_pattern(comic.title, volume), settings.device_comic_format_kcc.lower())))
+            assembled[volume] = output_file
 
     return assembled
 
@@ -185,7 +209,7 @@ def fill_metadata(settings, comic, chapters, assembled_ebooks):
             local_cover_bytes = response.read()
             local_cover.write(local_cover_bytes)
 
-        zip_cover_path = 'OEBPS/Images/cover.jpg'
+        zip_cover_path = join('OEBPS', 'Images', 'cover.jpg')
         zip_utils.delete_from_zip_file(ebook_file, file_names=zip_cover_path)
 
         with zipfile.ZipFile(ebook_file, 'a') as ebook:
@@ -195,16 +219,30 @@ def fill_metadata(settings, comic, chapters, assembled_ebooks):
 def convert_to_mobi(assembled_ebooks):
     converted_ebooks = {}
 
-    if os.system('kindlegen') == 0:
+    kindle_gen_exists = Popen('kindlegen', stdout=PIPE, stderr=STDOUT, stdin=PIPE, shell=True)
+    kindle_gen_exists.communicate()
+
+    if kindle_gen_exists.returncode == 0:
         for volume, ebook_file in assembled_ebooks.items():
-            if os.system('kindlegen "{}" -c2'.format(ebook_file)) != 0:
+            info('Converting file "{}" to MOBI...'.format(ebook_file))
+
+            kindle_gen_convert = Popen(
+                'kindlegen "{}" -c2'.format(ebook_file),
+                stdout=PIPE,
+                stderr=STDOUT,
+                stdin=PIPE,
+                shell=True
+            )
+            kindle_gen_convert.communicate()
+
+            if kindle_gen_convert.returncode != 0:
                 error('Error to convert file "{}" to MOBI'.format(ebook_file))
                 continue
 
             os.remove(ebook_file)
             converted_ebooks[volume] = os.path.join(ebook_file, str(ebook_file).replace('.epub', '.mobi'))
     else:
-        warning('KindleGen not detected!')
+        warning('KindleGen not found!')
 
     return converted_ebooks
 
