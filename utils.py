@@ -3,7 +3,7 @@ import re
 import shutil
 import urllib.request
 import zipfile
-from logging import debug, warning
+from logging import debug, warning, error
 from os.path import join
 
 import ruamel.std.zipfile as zip_utils
@@ -171,11 +171,20 @@ def fill_metadata(settings, comic, chapters, assembled_ebooks):
 
 
 def convert_to_mobi(assembled_ebooks):
-    if 'kindlegen' in os.path:
-        for ebook_file in assembled_ebooks.items():
-            os.system('kindlegen "{}" -c2'.format(ebook_file))
+    converted_ebooks = {}
+
+    if os.system('kindlegen') == 0:
+        for volume, ebook_file in assembled_ebooks.items():
+            if os.system('kindlegen "{}" -c2'.format(ebook_file)) != 0:
+                error('Error to convert file "{}" to MOBI'.format(ebook_file))
+                continue
+
+            os.remove(ebook_file)
+            converted_ebooks[volume] = os.path.join(ebook_file, str(ebook_file).replace('.epub', '.mobi'))
     else:
         warning('KindleGen not detected!')
+
+    return converted_ebooks
 
 
 def clean_temporary_data(temp_directory, assembled_ebooks=None, force_clean=False):

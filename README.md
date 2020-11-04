@@ -9,11 +9,13 @@ format
 
 ### Optional dependencies
 
-- [calibre](https://github.com/kovidgoyal/calibre) >> For metadata edit
+- KindleGen >> EPUB to MOBI conversion
+    * Can be found in [AUR](https://aur.archlinux.org/packages/kindlegen/)
+      and [here](https://archive.org/details/kindlegen2.9)
 
 ## Suggested Workflow
 
 ```
-manga-py --destination "$COMIC_DOWNLOAD_PATH" --save-current-chapter-info --save-manga-info [other-options...] URL
+manga-py --save-chapter-info --save-manga-info [-d|--destination] "$COMIC_DOWNLOAD_PATH" [other-options...] URL
 manga-py-assembler [other-options...] --comic-path "$COMIC_DOWNLOAD_PATH/$COMIC_NAME"
 ```

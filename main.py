@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     # Convert to MOBI
     if settings.comic_format == 'MOBI':
-        utils.convert_to_mobi(assembled_ebooks)
+        assembled_ebooks = utils.convert_to_mobi(assembled_ebooks)
 
     # Show results
     info('Finished!')
