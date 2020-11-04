@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import urllib.request
 import zipfile
@@ -13,11 +12,17 @@ from chapter import Chapter
 from comic import Comic
 
 
-def volume_pattern(title, volume_number):
-    return '{} - Volume {}'.format(title, volume_number)
+def volume_pattern(title, volume: str):
+    if volume.isnumeric():
+        return '{} - Volume {}'.format(title, volume)
+
+    return '{} - {}'.format(title, volume)
 
 
-def chapter_pattern(chapter_number, chapter_title):
+def chapter_pattern(chapter_number, chapter_title: str):
+    if chapter_title is None or chapter_title.strip() == '':
+        return 'Chapter {}'.format(chapter_number)
+
     return 'Chapter {}: {}'.format(chapter_number, chapter_title)
 
 
@@ -26,12 +31,25 @@ def read_files_as_chapters(files):
 
     for file in files:
         with zipfile.ZipFile(file, "r") as zip_file:
-            for name in zip_file.namelist():
+            if 'info.json' in zip_file.namelist():
+                info_file = [file for file in zip_file.namelist() if file == 'info.json'][0]
+                zip_file_data = zip_file.read(info_file).decode("utf-8")
 
-                if re.search(r'info\.json$', name) is not None:
-                    zip_file_data = zip_file.read(name).decode("utf-8")
+                chapters.append(Chapter.from_file(zip_file_data, file))
 
-                    chapters.append(Chapter(zip_file_data, file))
+            else:
+                chapter_info = zip_file.filename.rsplit(os.sep, 1)[1].replace('.zip', '').rsplit('-', 1)
+                chapter_number = ''.join([letter for letter in chapter_info[0] if letter.isnumeric()]).strip('0')
+                chapter_language = chapter_info[1]
+                chapters.append(
+                    Chapter(volume='Single Volume',
+                            chapter=chapter_number,
+                            title='',
+                            language=chapter_language,
+                            publisher='',
+                            local_path=file
+                            )
+                )
 
     return chapters
 
@@ -154,6 +172,10 @@ def fill_metadata(settings, comic, chapters, assembled_ebooks):
     publishers, languages = chapter_publishers_and_languages(chapters)
 
     for volume, ebook_file in assembled_ebooks.items():
+        if volume not in comic.volume_covers:
+            warning('Volume "{}" not found in the list of covers...'.format(volume))
+            continue
+
         cloud_cover_url = comic.volume_covers[volume]
         response = urllib.request.urlopen(cloud_cover_url)
 

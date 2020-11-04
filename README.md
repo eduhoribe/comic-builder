@@ -15,7 +15,19 @@ format
 
 ## Suggested Workflow
 
+For sites that support chapter and comic metadata (Ex. MangaDex)
+
 ```
-manga-py --save-chapter-info --save-manga-info [-d|--destination] "$COMIC_DOWNLOAD_PATH" [other-options...] URL
-manga-py-assembler [other-options...] --comic-path "$COMIC_DOWNLOAD_PATH/$COMIC_NAME"
+manga-py --save-chapter-info --save-manga-info [-d|--destination] "COMIC_DOWNLOAD_PATH" [other-options...] URL
+manga-py-assembler [other-options...] --comic-path "COMIC_DOWNLOAD_PATH/COMIC_NAME"
+```
+
+For other sites
+
+* Create a metadata file based
+  in [this file](https://github.com/eduhoribe/manga-py-assembler/blob/main/samples/comic-metadata-sample.json)
+
+```
+manga-py [-d|--destination] "COMIC_DOWNLOAD_PATH" [other-options...] URL
+manga-py-assembler --metadata "METADATA_FILE" [other-options...] --comic-path "COMIC_DOWNLOAD_PATH/COMIC_NAME"
 ```

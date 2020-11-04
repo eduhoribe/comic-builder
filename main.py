@@ -44,8 +44,7 @@ if __name__ == '__main__':
     # Search for chapters
     chapters = utils.read_files_as_chapters(files)
     if len(chapters) == 0:
-        warning('No chapter with metadata saved was found!')
-        warning('Make sure to run manga-py with the parameters "--save-current-chapter-info" and "--save-manga-info"')
+        warning('No chapter saved was found!')
 
         utils.clean_temporary_data(temp_directory, force_clean=True)
 
