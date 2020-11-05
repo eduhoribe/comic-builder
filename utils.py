@@ -2,9 +2,11 @@ import os
 import shutil
 import urllib.request
 import zipfile
+from html import unescape as html_unescape
 from logging import debug, warning, error, info
 from os.path import join
 from subprocess import STDOUT, PIPE
+from xml.sax.saxutils import escape as xml_escape
 
 import ruamel.std.zipfile as zip_utils
 from kindlecomicconverter.comic2ebook import main as kcc_c2e
@@ -72,38 +74,29 @@ def read_chapters_as_volumes(chapters):
     return volumes
 
 
+def escape_text(text):
+    return xml_escape(html_unescape(text))
+
+
 def build_comic_info_author_xml(authors: list):
-    authors_str = ''
+    authors_str = escape_text(', '.join(authors))
 
-    if len(authors) >= 1:
-        authors_str += '<Writer>{}</Writer>'.format(authors[0])
-
-    if len(authors) >= 2:
-        authors_str += '<Pencillers>{}</Pencillers>'.format(authors[1])
-
-    if len(authors) >= 3:
-        authors_str += '<Inkers>{}</Inkers>'.format(authors[2])
-
-    if len(authors) >= 4:
-        colorists = []
-
-        for colorist in authors[3:]:
-            colorists.append(colorist)
-
-        authors_str += '<Colorists>{}</Colorists>'.format(', '.join(colorists))
-
-    return authors_str
+    return '<Writer>{}</Writer>'.format(authors_str) if authors != '' else ''
 
 
 def build_comic_info_xml(comic: Comic, volume):
+    series_val = escape_text(volume_pattern(comic.title, volume))
+    summary_val = escape_text(comic.description)
+
+    series_tag = '<Series>{}</Series>'.format(series_val) if series_val != '' else ''
+    summary_tag = '<Summary>{}</Summary>'.format(summary_val) if summary_val != '' else ''
+
     return '''<?xml version="1.0" encoding="utf-8"?>
 <ComicInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<Series>{}</Series>
-<Volume>{}</Volume>
-<Summary>{}</Summary>
 {}
-</ComicInfo>'''.format(volume_pattern(comic.title, volume), volume, comic.description,
-                       build_comic_info_author_xml(comic.authors))
+{}
+{}
+</ComicInfo>'''.format(series_tag, summary_tag, build_comic_info_author_xml(comic.authors))
 
 
 def extract_volume_pages(settings, comic, volumes):
