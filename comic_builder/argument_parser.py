@@ -23,7 +23,7 @@ def build_argument_parser():
     )
 
     required_group = parser.add_argument_group('Required options')
-    required_group.add_argument('--comic-path', metavar='COMIC_PATH', help='Comic path to be assembled')
+    required_group.add_argument('--comic-path', metavar='COMIC_PATH', help='Comic path to be assembled', required=True)
 
     archive_group = parser.add_argument_group('Archive options')
     archive_group.add_argument('--output-format',

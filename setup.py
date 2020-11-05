@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="comic-builder-eduhoribe",
+    name="comic-builder",
     version="0.0.1",
     author="Eduwardo Horibe",
     author_email="eduhoribe@gmail.com",
