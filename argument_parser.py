@@ -5,12 +5,12 @@ from argparse import RawDescriptionHelpFormatter as Formatter
 
 def build_argument_parser():
     parser = ArgumentParser(
-        prog='manga-py-assembler',
+        prog='comic-builder',
         description=(
-            'manga-py-assembler is a manga-py auxiliary tool, made for organize and join comic chapters{}'
+            'comic-builder is a manga-py auxiliary tool, made for organize and join comic chapters{}'
             'Links:{}'
-            '  manga-py-assembler{}'
-            '    * source-code.: https://github.com/eduhoribe/manga-py-assembler{}'
+            '  comic-builder{}'
+            '    * source-code.: https://github.com/eduhoribe/comic-builder{}'
             '  manga-py{}'
             '    * site........: https://manga-py.com/manga-py{}'
             '    * source-code.: https://github.com/manga-py/manga-py{}'
@@ -43,8 +43,7 @@ def build_argument_parser():
     metadata_group.add_argument('--metadata',
                                 help='Path to comic metadata file. (Default: COMIC_PATH/info.json) '
                                      'The file must follow the sample in '
-                                     'https://github.com/eduhoribe/manga-py-assembler/blob/main/'
-                                     'samples/comic-metadata-sample.json')
+                                     'https://github.com/eduhoribe/comic-builder/blob/goshujin-sama/samples/comic-metadata-sample.json')
     metadata_group.add_argument('--title', help='Comic Title')
     metadata_group.add_argument('--authors', help='Comic Authors', nargs='+')
 

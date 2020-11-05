@@ -85,7 +85,7 @@ class Settings:
         return '' if self.grayscale else '--forcecolor'
 
     def temp_directory(self, comic):
-        return '{}/manga-py-assembler/{}_{}'.format(
+        return '{}/comic-builder/{}_{}'.format(
             self.auxiliary_folder if self.auxiliary_folder is not None else temporary_directory(),
             self.random_id,
             comic.title
