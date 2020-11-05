@@ -11,7 +11,7 @@ def build_argument_parser():
     parser = ArgumentParser(
         prog='metadata-ejector',
         description=(
-            'metadata-ejector is a comic-builder auxiliary tool, made to export metadata in comic chapters'
+            'metadata-ejector is a comic_builder auxiliary tool, made to export metadata in comic chapters'
         ),
         formatter_class=Formatter
     )

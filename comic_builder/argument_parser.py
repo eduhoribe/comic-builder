@@ -5,11 +5,11 @@ from argparse import RawDescriptionHelpFormatter as Formatter
 
 def build_argument_parser():
     parser = ArgumentParser(
-        prog='comic-builder',
+        prog='comic_builder',
         description=(
-            'comic-builder is a manga-py auxiliary tool, made for organize and join comic chapters{}'
+            'comic_builder is a manga-py auxiliary tool, made for organize and join comic chapters{}'
             'Links:{}'
-            '  comic-builder{}'
+            '  comic_builder{}'
             '    * source-code.: https://github.com/eduhoribe/comic-builder{}'
             '  manga-py{}'
             '    * site........: https://manga-py.com/manga-py{}'

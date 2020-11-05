@@ -13,7 +13,7 @@ def build_argument_parser():
     parser = ArgumentParser(
         prog='metadata-injector',
         description=(
-            'metadata-injector is a comic-builder auxiliary tool, made to insert metadata in comic chapters'
+            'metadata-injector is a comic_builder auxiliary tool, made to insert metadata in comic chapters'
         ),
         formatter_class=Formatter
     )
