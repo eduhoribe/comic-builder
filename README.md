@@ -26,7 +26,7 @@ python MANGA_PY_ASSEMBLER_PATH/main.py [other-options...] --comic-path "COMIC_DO
 For other sites
 
 * Create a metadata file based
-  in [this file](https://github.com/eduhoribe/comic-builder/blob/main/samples/comic-metadata-sample.json)
+  in [this file](https://github.com/eduhoribe/comic-builder/blob/goshujin-sama/samples/comic-metadata-sample.json)
 
 ```
 manga-py [-d|--destination] "COMIC_DOWNLOAD_PATH" [other-options...] URL
