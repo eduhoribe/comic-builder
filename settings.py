@@ -20,6 +20,8 @@ class Settings:
     stretch: bool
     grayscale: bool
     auxiliary_folder: str
+    overwrite_existing: bool
+    skip_existing: bool
     debug_enabled = bool
 
     def __init__(self, args):
@@ -36,6 +38,8 @@ class Settings:
         self.stretch = args.stretch
         self.grayscale = args.grayscale
         self.auxiliary_folder = args.aux_parent_folder
+        self.overwrite_existing = args.overwrite_existing
+        self.skip_existing = args.skip_existing
         self.debug_enabled = args.debug
 
     @property

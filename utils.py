@@ -140,6 +140,20 @@ def assemble_volumes(settings, comic, volumes):
     assembled = {}
 
     for volume in volumes.keys():
+        final_output_file = join(settings.output,
+                                 '{}.{}'.format(volume_pattern(comic.title, volume), settings.comic_format.lower()))
+
+        if os.path.exists(final_output_file):
+            info('File "{}" already exists'.format(final_output_file))
+
+            if settings.skip_existing:
+                info('Skipping...')
+                continue
+
+            if settings.overwrite_existing:
+                debug('Overwriting...')
+                os.remove(final_output_file)
+
         volume_temp_data = settings.volume_temp_directory(comic, volume)
         os.path.isdir(settings.output) or os.makedirs(settings.output)
 

@@ -35,6 +35,9 @@ def build_argument_parser():
     archive_group.add_argument('--aux-parent-folder',
                                help='Auxiliary parent folder, who will store the images temporally. '
                                     '(Default: System temporary folder)')
+    archive_subgroup = archive_group.add_mutually_exclusive_group()
+    archive_subgroup.add_argument('--overwrite-existing', help='Writes over existing files', action='store_true')
+    archive_subgroup.add_argument('--skip-existing', help='Skip existing files', action='store_true')
 
     metadata_group = parser.add_argument_group('Metadata options')
     metadata_group.add_argument('--metadata',

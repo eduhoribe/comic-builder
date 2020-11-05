@@ -58,6 +58,9 @@ if __name__ == '__main__':
 
     # Assemble volumes in ebook format
     assembled_ebooks = utils.assemble_volumes(settings, comic, volumes)
+    if len(assembled_ebooks) <= 0:
+        warning('No file was assembled!')
+        sys.exit(0)
 
     # Fill metadata
     utils.fill_metadata(settings, comic, chapters, assembled_ebooks)
