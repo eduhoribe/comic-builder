@@ -92,7 +92,7 @@ class Settings:
         )
 
     def volume_temp_directory(self, comic, volume):
-        return join(self.temp_directory(comic), utils.volume_pattern(comic.title, volume))
+        return join(self.temp_directory(comic), utils.escape_file_path(utils.volume_pattern(comic.title, volume)))
 
     def read_files(self):
         return [join(self.comic_path, file) for file in listdir(self.comic_path)

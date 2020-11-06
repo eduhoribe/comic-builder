@@ -16,6 +16,14 @@ from .chapter import Chapter
 from .comic import Comic
 
 
+def escape_file_path(path: str):
+    return path.replace(os.sep, '|')
+
+
+def chapter_temp_directory_name(chapter):
+    return chapter_pattern(chapter.chapter, escape_file_path(chapter.title))
+
+
 def volume_pattern(title, volume: str):
     if volume.isnumeric():
         return '{} - Volume {}'.format(title, volume)
@@ -107,7 +115,7 @@ def extract_volume_pages(settings, comic, volumes):
         debug('Extracting pages for "{}"...'.format(volume_pattern(comic.title, volume)))
 
         for chapter in chapters:
-            chapter_directory = join(volume_directory, chapter_pattern(chapter.chapter, chapter.title))
+            chapter_directory = join(volume_directory, chapter_temp_directory_name(chapter))
             os.mkdir(chapter_directory)
 
             with zipfile.ZipFile(chapter.local_path, "r") as zip_file:
