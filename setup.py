@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="comic-builder",
-    version="0.0.22",
+    version="0.0.23",
     author="Eduwardo Horibe",
     author_email="eduhoribe@gmail.com",
     description="Build e-book files from comic images",
@@ -18,6 +18,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=(
         'tests',
     )),
+    keywords=['comic', 'manga', 'manga-py', 'ebook', 'epub', 'mobi', 'kindle'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
