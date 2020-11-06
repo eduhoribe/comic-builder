@@ -40,11 +40,13 @@ def kindlegen_linux_install(parser):
     # extract kindlegen binary
     with tarfile.open(kindlegen_file_path, 'r') as kindlegen_file:
         try:
+            path.isdir(kindlegen_file_dest) or os.makedirs(kindlegen_file_dest)
+
             kindlegen_file.extract('kindlegen', kindlegen_file_dest)
 
         except PermissionError:
             warning('User has no permission to create the binary file in "{}"'.format(kindlegen_file_dest))
-            warning('Run the command with --user to use the user bin folder')
+            warning('Run the command with super user privileges (e.g. sudo) or --user to use the user bin folder')
 
 
 def kindlegen_mac_install():
