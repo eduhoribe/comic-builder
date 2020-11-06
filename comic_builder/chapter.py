@@ -23,4 +23,3 @@ class Chapter:
             publisher=json_object['publisher'],
             local_path=local_path
         )
-

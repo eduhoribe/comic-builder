@@ -23,7 +23,7 @@ def build_argument_parser():
     return parser
 
 
-if __name__ == '__main__':
+def main():
     # Read arguments
     argument_parser = build_argument_parser()
     args = argument_parser.parse_args()
@@ -50,3 +50,7 @@ if __name__ == '__main__':
 
             with open(metadata, 'w') as metadata_file:
                 metadata_file.write(metadata_info)
+
+
+if __name__ == '__main__':
+    main()

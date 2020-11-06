@@ -3,7 +3,7 @@ import sys
 from logging import fatal
 from os import path
 
-from comic import Comic
+from .comic import Comic
 
 
 class MetadataParser:

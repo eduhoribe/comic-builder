@@ -4,10 +4,10 @@ import sys
 from logging import fatal, debug, info, warning
 from os import path
 
-import utils
-from argument_parser import build_argument_parser
-from metadata_parser import MetadataParser
-from settings import Settings
+from . import utils
+from .argument_parser import build_argument_parser
+from .metadata_parser import MetadataParser
+from .settings import Settings
 
 
 def main():
@@ -79,3 +79,7 @@ def main():
 
     # Remove temporary data
     utils.clean_temporary_data(temp_directory, assembled_ebooks)
+
+
+if __name__ == '__main__':
+    main()

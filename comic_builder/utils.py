@@ -12,8 +12,8 @@ import ruamel.std.zipfile as zip_utils
 from kindlecomicconverter.comic2ebook import main as kcc_c2e
 from psutil import Popen
 
-from chapter import Chapter
-from comic import Comic
+from .chapter import Chapter
+from .comic import Comic
 
 
 def volume_pattern(title, volume: str):

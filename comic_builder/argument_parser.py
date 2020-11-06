@@ -57,9 +57,11 @@ def build_argument_parser():
                              )
     image_group.add_argument('--comic-style', help='Comic style. (Default: %(default)s)',
                              choices=['DEFAULT', 'MANGA', 'WEBTOON'], default='DEFAULT')
-    image_group.add_argument('--no-upscale', help='Do not resize images smaller than device resolution',
+    image_group.add_argument('--no-upscale',
+                             help='Do not resize images smaller than device resolution. (NOT RECOMMENDED!)',
                              action="store_true")
-    image_group.add_argument('--stretch', help='Stretch images to device resolution', action="store_true")
+    image_group.add_argument('--stretch', help='Stretch images to device resolution. May lose original proportion!',
+                             action="store_true")
     image_group.add_argument('--grayscale', help='Apply grayscale filter in all pages', action="store_true")
     image_group.add_argument('--low-quality', help='Omits -hq parameter for kcc', action="store_true")
 

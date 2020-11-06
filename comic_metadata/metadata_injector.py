@@ -25,7 +25,7 @@ def build_argument_parser():
     return parser
 
 
-if __name__ == '__main__':
+def main():
     # Read arguments
     argument_parser = build_argument_parser()
     args = argument_parser.parse_args()
@@ -51,3 +51,7 @@ if __name__ == '__main__':
 
         with zipfile.ZipFile(chapter, 'a') as zip_file:
             zip_file.write(metadata, 'info.json')
+
+
+if __name__ == '__main__':
+    main()
