@@ -11,7 +11,7 @@ setuptools.setup(
     version="0.0.22",
     author="Eduwardo Horibe",
     author_email="eduhoribe@gmail.com",
-    description="A tool to organize, merge and export comic pages into a ebook format",
+    description="Build e-book files from comic images ",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/eduhoribe/comic-builder",
