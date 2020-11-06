@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="comic-builder",
-    version="0.0.16",
+    version="0.0.17",
     author="Eduwardo Horibe",
     author_email="eduhoribe@gmail.com",
     description="A tool to organize, merge and export comic pages into a ebook format",
@@ -30,6 +30,7 @@ setuptools.setup(
             'comic-builder = comic_builder.__main__:main',
             'comic-metadata-injector = comic_metadata.metadata_injector:main',
             'comic-metadata-ejector = comic_metadata.metadata_ejector:main',
+            'kindlegen_installer = kindlegen_installer.kindlegen_installer:main',
         ]
     },
 )
