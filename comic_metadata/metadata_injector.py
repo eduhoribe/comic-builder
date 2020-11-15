@@ -31,6 +31,7 @@ def main():
     args = argument_parser.parse_args()
 
     chapter_dir = args.chapter_dir
+    chapter_metadata_filename = 'eduhoribe.json'
 
     if not path.isdir(chapter_dir):
         fatal('Directory "{}" does not exists'.format(chapter_dir))
@@ -44,13 +45,13 @@ def main():
 
     for chapter, metadata in metadata_chapters.items():
         with zipfile.ZipFile(chapter, 'r') as zip_file:
-            contains_metadata = len([file for file in zip_file.namelist() if file == 'info.json']) > 0
+            contains_metadata = len([file for file in zip_file.namelist() if file == chapter_metadata_filename]) > 0
 
         if contains_metadata:
-            zip_utils.delete_from_zip_file(chapter, file_names='info.json')
+            zip_utils.delete_from_zip_file(chapter, file_names=chapter_metadata_filename)
 
         with zipfile.ZipFile(chapter, 'a') as zip_file:
-            zip_file.write(metadata, 'info.json')
+            zip_file.write(metadata, chapter_metadata_filename)
 
 
 if __name__ == '__main__':

@@ -44,10 +44,12 @@ def chapter_pattern(chapter_number, chapter_title: str):
 def read_files_as_chapters(files):
     chapters = []
 
+    chapter_metadata_filename = 'eduhoribe.json'
+
     for file in files:
         with zipfile.ZipFile(file, "r") as zip_file:
-            if 'info.json' in zip_file.namelist():
-                info_file = [file for file in zip_file.namelist() if file == 'info.json'][0]
+            if chapter_metadata_filename in zip_file.namelist():
+                info_file = [file for file in zip_file.namelist() if file == chapter_metadata_filename][0]
                 zip_file_data = zip_file.read(info_file).decode("utf-8")
 
                 chapters.append(Chapter.from_file(zip_file_data, file))
