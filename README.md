@@ -1,7 +1,7 @@
 # comic-builder
 
-Auxiliary tool for [manga-py](https://github.com/manga-py/manga-py) to organize, merge and export the files in a ebook
-format (EPUB or MOBI)
+An auxiliary tool for [manga-py](https://github.com/manga-py/manga-py) to organize, merge and export the files in an
+ebook format (EPUB or MOBI)
 
 ## Dependencies
 
@@ -24,12 +24,12 @@ kindlegen-installer # to install KindleGen
 
 ## Modules
 
-Actually there is 4 modules in this repository
+Today there are 4 modules in this repository
 
-- `comic-builder` > Join the comic files into a ebook format
+- `comic-builder` > Join the comic files into an ebook format
 - `kindlegen-installer` > Install the KindleGen binary
 - `comic-metadata-inject` > Inject metadata files into the chapters files with the same name
-- `comic-metadata-eject` > Extract the chapters metadata files
+- `comic-metadata-eject` > Extract the chapter's metadata files
 
 P.S. The commands `comic-metadata-inject` and `comic-metadata-eject` can be used together to edit some details in the
 chapters metadata
