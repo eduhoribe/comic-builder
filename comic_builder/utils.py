@@ -1,6 +1,5 @@
 import os
 import shutil
-import urllib.request
 import zipfile
 from html import unescape as html_unescape
 from logging import debug, warning, error, info
@@ -8,6 +7,7 @@ from os.path import join
 from subprocess import STDOUT, PIPE
 from xml.sax.saxutils import escape as xml_escape
 
+import requests
 import ruamel.std.zipfile as zip_utils
 from kindlecomicconverter.comic2ebook import main as kcc_c2e
 from psutil import Popen
@@ -17,7 +17,10 @@ from .comic import Comic
 
 
 def escape_file_path(path: str):
-    return path.replace(os.sep, '|')
+    if path is not None:
+        return path.replace(os.sep, '|')
+
+    return ''
 
 
 def chapter_temp_directory_name(chapter):
@@ -25,11 +28,12 @@ def chapter_temp_directory_name(chapter):
 
 
 def volume_pattern(title, volume: str):
-    if volume.isnumeric():
-        return '{} - Volume {}'.format(title, volume)
+    if volume is not None:
+        if volume.isnumeric():
+            return '{} - Volume {}'.format(title, volume)
 
-    if volume.strip() != '':
-        return '{} - {}'.format(title, volume)
+        if volume.strip() != '':
+            return '{} - {}'.format(title, volume)
 
     return '{}'.format(title)
 
@@ -213,18 +217,26 @@ def fill_metadata(settings, comic, chapters, assembled_ebooks):
     publishers, languages = chapter_publishers_and_languages(chapters)
 
     for volume, ebook_file in assembled_ebooks.items():
-        if volume not in comic.volume_covers:
+        cloud_cover_url = None
+
+        # try to get cover from list
+        if volume in comic.volume_covers:
+            cloud_cover_url = comic.volume_covers[volume]
+
+        # or use comic generic cover, if exists
+        elif '' in comic.volume_covers:
+            cloud_cover_url = comic.volume_covers['']
+
+        if cloud_cover_url is None:
             warning('Volume "{}" not found in the list of covers...'.format(volume))
             continue
 
-        cloud_cover_url = comic.volume_covers[volume]
-        response = urllib.request.urlopen(cloud_cover_url)
+        response = requests.get(cloud_cover_url)
 
         local_cover_path = join(settings.temp_directory(comic), volume_pattern(comic.title, volume), 'cover')
 
         with open(local_cover_path, 'wb') as local_cover:
-            local_cover_bytes = response.read()
-            local_cover.write(local_cover_bytes)
+            local_cover.write(response.content)
 
         zip_cover_path = join('OEBPS', 'Images', 'cover.jpg')
         zip_utils.delete_from_zip_file(ebook_file, file_names=zip_cover_path)
@@ -252,7 +264,7 @@ def convert_to_mobi(assembled_ebooks):
             )
             kindle_gen_convert.communicate()
 
-            if kindle_gen_convert.returncode != 0:
+            if kindle_gen_convert.returncode not in [0, 1]:  # acceptable exit codes
                 error('Error to convert file "{}" to MOBI'.format(ebook_file))
                 continue
 
