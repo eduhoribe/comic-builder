@@ -8,6 +8,7 @@
   ],
   "sauce": "COMIC SOURCE",
   "volume_covers": {
+    "": "DEFAULT VOLUME COVER",
     "1": "VOLUME 1 COVER",
     "2": "VOLUME 2 COVER",
     "3": "VOLUME 3 COVER",
