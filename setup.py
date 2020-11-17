@@ -31,7 +31,7 @@ setuptools.setup(
             'comic-builder = comic_builder.__main__:main',
             'comic-metadata-injector = comic_metadata.metadata_injector:main',
             'comic-metadata-ejector = comic_metadata.metadata_ejector:main',
-            'kindlegen_installer = kindlegen_installer.kindlegen_installer:main',
+            'kindlegen-installer = kindlegen_installer.kindlegen_installer:main',
         ]
     },
 )
